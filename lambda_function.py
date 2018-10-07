@@ -1,7 +1,9 @@
 import json
-from dependency import boto3
+import boto3
 from dependency import kubernetes as k8s
 import os
+import yaml
+
 
 def lambda_handler(event, context):
     # TODO implement
@@ -40,6 +42,12 @@ def main():
     delploy_config = load_deploy_config()
     deployfile = delploy_config['deployment_file']
     client = k8s.client.CoreApi()
+    with open(deployfile) as f:
+        dep = yaml.load(f)
+        k8s_beta = k8s.client.ExtensionsV1beta1Api()
+        resp = k8s_beta.create_namespaced_deployment(
+            body=dep, namespace="default")
+        print("Deployment created. status='%s'" % str(resp.status))
 
 
 if __name__ == '__main__':
