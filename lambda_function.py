@@ -3,6 +3,7 @@ import boto3
 import kubernetes as k8s
 import os
 import yaml
+import subprocess
 
 
 def lambda_handler(event, context):
@@ -52,8 +53,31 @@ def setting_kubefile():
     k8s.config.load_kube_config(fileurl)
     
 
+def get_token(cluster_name):
+    args = ("./aws-iam-authenticator", "token", "-i", cluster_name)
+    popen = subprocess.Popen(args, stdout=subprocess.PIPE)
+    popen.wait()
+    res = popen.stdout.read().rstrip()
+    res = json.loads(res)
+    print(res['status']['token'])
+    return res['status']['token']
+
+
+def k8s_auth_setting():
+    api_token = get_token(os.environ['CLUSTER_NAME'])
+    configuration = k8s.client.Configuration()
+    configuration.host = os.environ['API_ENDPOINT']
+    configuration.verify_ssl = False
+    configuration.debug = True
+    configuration.api_key['authorization'] = "Bearer " + api_token
+    configuration.assert_hostname = True
+    configuration.verify_ssl = False
+    k8s.client.Configuration.set_default(configuration)
+
+
 def main():
-    setting_kubefile()
+    #setting_kubefile()
+    k8s_auth_setting()
     delploy_file = load_deploy_yml()
     client = k8s.client.CoreApi()
     delploy_yml = yaml.load(delploy_file)
