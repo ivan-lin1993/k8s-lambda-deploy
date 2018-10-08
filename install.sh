@@ -1,1 +1,1 @@
-pip3.6 install -r requirments.txt -t
+pip3.6 install -r requirments.txt -t .
