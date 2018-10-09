@@ -79,11 +79,14 @@ def main():
     #setting_kubefile()
     k8s_auth_setting()
     delploy_file = load_deploy_yml()
-    client = k8s.client.CoreApi()
-    delploy_yml = yaml.load(delploy_file)
-    k8s_beta = k8s.client.ExtensionsV1beta1Api()
-    resp = k8s_beta.create_namespaced_deployment(
-        body=delploy_yml, namespace="default")
+    v1 = k8s.client.ExtensionsV1beta1Api()
+    deploy_yml = yaml.load(delploy_file)
+    print("========================================================")
+    print(deploy_yml)
+    print("=======================================================")
+    resp = v1.patch_namespaced_deployment(name='eks-web', body=deploy_yml, namespace="default")
+    
+    #resp = v1.create_namespaced_deployment( namespace="default", body= deploy_yml)
     print("Deployment created. status='%s'" % str(resp.status))
 
 
