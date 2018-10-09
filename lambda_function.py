@@ -17,7 +17,7 @@ def lambda_handler(event, context):
 def download_kubeconfig():
     try:
         s3 = boto3.resource('s3')
-        s3.Object(os.environ['S3_BUCKET'],os.environ['CLUSTER_NAME'] + '/' + os.environ['KUBECONFIG_FILE']).download_file('/tmp/kubeconfig')
+        s3.Object(os.environ['S3_BUCKET'],os.environ['CLUSTER_NAME'] + '/kubeconfig' ).download_file('/tmp/kubeconfig')
     except Exception as e:
         print(e)
         raise
