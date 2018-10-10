@@ -1,6 +1,6 @@
 import json
 import boto3
-import kubernetes as k8s
+import kubernetes
 import os
 import yaml
 import subprocess
@@ -40,7 +40,7 @@ def load_deploy_config():
 def load_deploy_yml():
     try:
         s3 = boto3.resource('s3')
-        res = s3.Object(os.environ['S3_BUCKET'], os.environ['CLUSTER_NAME'] + '/' + os.environ['DEPLOYFILE']).get()['Body'].read().decode()
+        res = s3.Object(os.environ['S3_BUCKET'], os.environ['CLUSTER_NAME'] + '/' + os.environ['DEPLOYFILE_NAME']).get()['Body'].read().decode()
     except Exception as e:
         print(e)
         raise
